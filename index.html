@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7d7e3">
+<title>fateme roshdi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Vazirmatn:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fffafa; --deep:#8f2d4d; --hot:#b3405e; --rose:#c76a86; --ink:#6b4a58;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100svh;
+  font-family:'Vazirmatn',Tahoma,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1000px 640px at 88% -8%, rgba(247,197,214,.5), transparent 62%),
+    radial-gradient(900px 700px at -6% 36%, rgba(250,214,228,.42), transparent 60%),
+    radial-gradient(1100px 900px at 55% 112%, rgba(246,203,220,.36), transparent 62%),
+    var(--bg);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:#f3cfdd;color:#8f2d4d}
+button{font:inherit}
+
+/* بافت کاغذی خیلی ظریف روی کل صفحه */
+.grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.045;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.18 0 0 0 0 0.28 0 0 0 0.6 0'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- دکمه‌ی بی‌صدا/باصدا ---------- */
+#soundBtn{position:fixed;top:16px;left:16px;z-index:55;width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(179,64,94,.35);background:rgba(255,255,255,.78);backdrop-filter:blur(4px);
+  color:var(--hot);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .3s,color .3s}
+#soundBtn:hover{background:#fff}
+#soundBtn .w{transition:opacity .2s}
+#soundBtn .x{opacity:0;transition:opacity .2s}
+#soundBtn.muted{color:#bb95a4}
+#soundBtn.muted .w{opacity:0}
+#soundBtn.muted .x{opacity:1}
+
+/* ---------- برگ‌های ریزان ---------- */
+.leaf-host{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+#leavesBack{z-index:0}
+#leavesFront{z-index:44}
+.leaf{position:absolute;top:0;left:0;transform-origin:center;will-change:transform}
+.lf-back{opacity:.55;filter:blur(1.1px)}
+.lf-front{opacity:.32}
+
+/* ---------- پرده اول ---------- */
+#cover{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;
+  background:radial-gradient(680px 540px at 50% 42%, rgba(248,199,218,.62), rgba(255,250,250,0) 68%), var(--bg);
+  transition:opacity .7s ease,visibility .7s ease;}
+#cover.gone{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.cover-kicker{font-size:12.5px;font-weight:600;letter-spacing:.24em;color:var(--rose);opacity:0;animation:rise .9s ease .15s forwards}
+.rose-wrap{position:relative;width:min(58vw,324px);aspect-ratio:1;margin:14px 0 2px;cursor:pointer;border-radius:50%;
+  opacity:0;animation:rise 1s ease .1s forwards;-webkit-tap-highlight-color:transparent;outline:none}
+.rose-wrap:focus-visible{outline:2px dashed var(--hot);outline-offset:12px}
+.rose-scale{width:100%;height:100%;transition:transform .65s cubic-bezier(.5,0,.3,1),opacity .55s ease}
+.rose-wrap:hover .rose-scale{transform:scale(1.02)}
+.rose-wrap.leaving .rose-scale{transform:scale(1.16) rotate(7deg);opacity:0}
+.ripple{position:absolute;inset:-6%;border:1.5px solid rgba(201,94,127,.42);border-radius:50%;pointer-events:none;opacity:0;
+  animation:rip 3s ease-out 1.6s infinite}
+@keyframes rip{0%{transform:scale(.8);opacity:.75}75%{transform:scale(1.1);opacity:0}100%{transform:scale(1.1);opacity:0}}
+#coverRose{width:100%;height:100%;animation:breathe 5.6s ease-in-out infinite}
+#coverRose svg{width:100%;height:100%;display:block;animation:slowspin 150s linear infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.016)}}
+@keyframes slowspin{to{transform:rotate(360deg)}}
+/* حالت «دعوت» بعد از پیام صوتی: رز با ضربان نرم دعوت به کلیک می‌کند */
+.rose-wrap.invited .ripple{border-color:rgba(201,94,127,.65);animation-duration:2s}
+.rose-wrap.invited .rose-scale{animation:invitePulse 1.7s ease-in-out infinite}
+@keyframes invitePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.cover-name{font-family:'Gulzar','Vazirmatn',serif;font-weight:400;font-size:clamp(46px,9vw,74px);line-height:1.75;color:#a63a5c;
+  opacity:0;animation:rise .9s ease 1.15s forwards}
+.cover-sub{font-size:14px;font-weight:300;color:#b2778c;opacity:0;animation:rise .9s ease 1.4s forwards}
+.cover-hint{margin-top:24px;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--hot);
+  opacity:0;animation:rise .9s ease 1.75s forwards}
+.cover-hint svg{animation:tapPulse 2.3s ease-in-out infinite}
+@keyframes tapPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.18);opacity:1}}
+
+/* ---------- صفحه اصلی ---------- */
+#scene{position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column;
+  opacity:0;visibility:hidden;transition:opacity .8s ease .1s,visibility .8s ease .1s}
+#scene.on{opacity:1;visibility:visible}
+.fade-item{opacity:0;transform:translateY(18px);transition:opacity .9s ease var(--fd,.2s),transform .9s ease var(--fd,.2s)}
+#scene.on .fade-item{opacity:1;transform:none}
+.stage{flex:1;width:min(1180px,100%);margin-inline:auto;position:relative;z-index:2;
+  padding:clamp(30px,7vh,70px) clamp(22px,5vw,64px);
+  display:grid;grid-template-columns:1.06fr .94fr;align-items:center;gap:clamp(28px,5vw,84px)}
+.kicker{display:flex;align-items:center;gap:14px;font-size:12.5px;font-weight:600;letter-spacing:.22em;color:var(--rose)}
+.kline{width:64px;height:1px;background:rgba(179,64,94,.4)}
+.title{font-family:'Gulzar','Vazirmatn',serif;font-weight:400;font-size:clamp(46px,6.2vw,84px);line-height:1.65;color:var(--deep);margin-top:8px}
+.name{font-family:'Gulzar','Vazirmatn',serif;font-weight:400;font-size:clamp(40px,4.8vw,62px);line-height:1.8;color:var(--hot);width:max-content;max-width:100%}
+.name .wave{display:block;width:172px;height:14px;margin-top:-4px;overflow:visible}
+.name .wave path{fill:none;stroke:#e5a3b9;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;
+  transition:stroke-dashoffset 1.3s ease 1.05s}
+#scene.on .wave path{stroke-dashoffset:0}
+.lede{margin-top:22px;font-size:clamp(15.5px,1.35vw,17.5px);font-weight:300;line-height:2.15;color:#6d4f5d;max-width:44ch}
+
+.rose-col{display:flex;flex-direction:column;align-items:center;gap:20px;position:relative;z-index:2}
+#heroRose{position:relative;width:min(64vw,330px);aspect-ratio:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#heroRose::after{content:'';position:absolute;left:50%;bottom:-10px;width:64%;height:30px;transform:translateX(-50%);
+  border-radius:50%;background:radial-gradient(closest-side,rgba(140,60,85,.16),transparent);z-index:-1}
+#heroRose svg{width:100%;height:100%;display:block;transition:transform .5s ease}
+#heroRose:hover svg{transform:scale(1.02)}
+#heroRose:active svg{transform:scale(.985)}
+#heroRose:focus-visible{outline:2px dashed var(--hot);outline-offset:10px;border-radius:50%}
+.tap-hint{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--hot);transition:opacity .6s}
+.tap-hint svg{animation:tapPulse 2.3s ease-in-out infinite}
+
+.message-area{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;min-height:260px;max-width:52ch}
+.msg-mark{width:1px;height:26px;background:rgba(179,64,94,.42)}
+#msg{font-size:clamp(15px,1.3vw,17px);line-height:2;color:#7c4a5c;transition:opacity .2s ease}
+#msg.placeholder{color:#b08a99;font-size:15px}
+#msg.swapping{opacity:0}
+#msg.final{color:var(--deep);font-weight:500;font-size:clamp(17px,1.5vw,19.5px)}
+.dots{display:flex;gap:10px}
+.dot{width:9px;height:9px;background:#eec6d5;border-radius:50% 50% 50% 0;transform:rotate(-45deg) scale(.9);
+  transition:.45s cubic-bezier(.3,1.4,.5,1)}
+.dot.done{background:var(--hot);transform:rotate(-45deg) scale(1.12)}
+.again{display:inline-flex;align-items:center;gap:8px;padding:9px 22px;border:1px solid rgba(179,64,94,.45);border-radius:999px;
+  background:rgba(255,255,255,.65);color:var(--hot);font-size:13.5px;font-weight:500;cursor:pointer;
+  opacity:0;transform:translateY(8px);transition:background .3s,color .3s}
+.again.in{opacity:1;transform:none;transition:opacity .6s ease .1s,transform .6s ease .1s,background .3s,color .3s}
+.again:hover{background:var(--hot);color:#fff}
+
+/* ---------- رز: شکوفایی و جداشدن گلبرگ ---------- */
+.rose .slot{transform-box:view-box;transform-origin:50% 50%;
+  transition:transform 1.05s cubic-bezier(.6,0,.25,1),opacity 1.05s}
+.rose.bloom .slot{animation:bloom 1.05s cubic-bezier(.18,.75,.28,1) both;animation-delay:var(--d)}
+@keyframes bloom{from{opacity:0;transform:scale(.16) rotate(-40deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+.rose .cell{transform-box:fill-box;transform-origin:50% 50%}
+.rose .core{transform-box:view-box;transform-origin:50% 50%}
+.rose.bloom .core{animation:coreIn .9s ease 1.5s both}
+@keyframes coreIn{from{opacity:0}to{opacity:1}}
+.rose.closed .slot:not(.gone){transform:scale(.72);opacity:.92}
+.rose.beating .core{animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}28%{transform:scale(1.1)}44%{transform:scale(1.01)}62%{transform:scale(1.06)}}
+
+/* ---------- رز گوشه با ساقه ---------- */
+.corner{position:absolute;bottom:-40px;left:-34px;width:250px;height:320px;z-index:1;pointer-events:none;opacity:.95}
+.c-stem{position:absolute;left:88px;top:148px;width:64px;height:172px}
+.c-sepals{position:absolute;left:84px;top:134px;width:68px;height:66px}
+.c-leaf{position:absolute;width:88px;height:auto}
+.c-leaf.l1{left:104px;top:190px;transform:rotate(-34deg)}
+.c-leaf.l2{left:22px;top:244px;transform:rotate(152deg) scaleX(-1)}
+.c-head{position:absolute;left:30px;top:-6px;width:170px;height:170px}
+.c-head svg{width:100%;height:100%;transform:scaleY(.92)}
+
+footer{position:relative;z-index:2;text-align:center;padding:8px 20px 30px;font-size:12.5px;letter-spacing:.06em;color:#b98fa0;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+
+#burst{position:fixed;inset:0;z-index:50;pointer-events:none}
+#burst svg{position:absolute;width:34px;height:34px}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;gap:34px;text-align:center;padding-top:44px}
+  .kicker{justify-content:center}
+  .name{margin-inline:auto}
+  .lede{margin-inline:auto}
+  .message-area{margin-inline:auto;min-height:300px}
+  .corner{display:none}
+  #heroRose{width:min(70vw,290px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- دکمه‌ی قطع/وصل صدا -->
+<button id="soundBtn" aria-label="قطع یا وصل صدا" title="صدا">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"/>
+    <g class="w"><path d="M14.5 9.5a4 4 0 0 1 0 5"/><path d="M17 7.5a7 7 0 0 1 0 9"/></g>
+    <g class="x"><path d="M16 9.8l5 4.4M21 9.8l-5 4.4"/></g>
+  </svg>
+</button>
+
+<div id="leavesBack" class="leaf-host" aria-hidden="true"></div>
+
+<!-- پرده اول -->
+<section id="cover">
+  <p class="cover-kicker">روز جهانی دختر · ۱۱ اکتبر</p>
+  <div class="rose-wrap" id="roseWrap" role="button" tabindex="0" aria-label="لمس رز برای باز شدن تبریک">
+    <span class="ripple" aria-hidden="true"></span>
+    <div class="rose-scale"><div id="coverRose"></div></div>
+  </div>
+  <h1 class="cover-name">فاطمه رشدی</h1>
+  <p class="cover-sub">هدیه‌ای کوچک، برای قشنگ‌ترین دخترِ دنیا</p>
+  <p class="cover-hint">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="14.6" r="3.3"/>
+      <path d="M12 8.4V5.9M7.7 10 6 8.3M16.3 10l1.7-1.7M5.6 14.6H3M21 14.6h-2.6"/>
+    </svg>
+    <span id="coverHintText">برای باز شدن تبریک، رز را لمس کن</span>
+  </p>
+</section>
+
+<div id="leavesFront" class="leaf-host" aria-hidden="true"></div>
+<div id="burst" aria-hidden="true"></div>
+
+<!-- پرده اصلی -->
+<main id="scene">
+  <div class="corner" id="corner" aria-hidden="true"></div>
+
+  <div class="stage">
+    <div class="text-col">
+      <p class="kicker fade-item" style="--fd:.05s"><span>روز جهانی دختر</span><i class="kline"></i><span>۱۱ اکتبر</span></p>
+      <h2 class="title fade-item" style="--fd:.18s">روزِ تو مبارک</h2>
+      <h3 class="name fade-item" style="--fd:.32s">فاطمه رشدی
+        <svg class="wave" viewBox="0 0 172 14" aria-hidden="true">
+          <path pathLength="1" d="M3 9 C 18 2, 33 2, 48 9 S 78 16, 93 9 S 123 2, 138 9 S 162 15, 169 7"/>
+        </svg>
+      </h3>
+      <p class="lede fade-item" style="--fd:.46s">تو همان بهاری هستی که پاییز هم به احترامش طلایی می‌پوشد.
+        دختر بودن یعنی هنرِ لطیف زیستن؛ و تو زیباترین شکلِ آن هستی.
+        این رز، هدیه‌ی کوچک به تو.</p>
+    </div>
+
+    <div class="rose-col">
+      <div id="heroRose" class="fade-item" style="--fd:.35s" role="button" tabindex="0"
+           aria-label="لمس رز؛ هر گلبرگ یک آرزو دارد"></div>
+
+      <p class="tap-hint fade-item" id="tapHint" style="--fd:.6s">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="14.6" r="3.3"/>
+          <path d="M12 8.4V5.9M7.7 10 6 8.3M16.3 10l1.7-1.7M5.6 14.6H3M21 14.6h-2.6"/>
+        </svg>
+        <span>هر لمس، یک گلبرگ؛ هر گلبرگ، یک آرزو</span>
+      </p>
+
+      <div class="message-area fade-item" style="--fd:.72s">
+        <span class="msg-mark" aria-hidden="true"></span>
+        <p id="msg" class="placeholder" aria-live="polite">روی رز لمس کن؛ هفت گلبرگش، هفت آرزوی قشنگ برای تو دارند.</p>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <button class="again" id="againBtn" hidden>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 12a8 8 0 1 1-2.3-5.6L20 8.6"/><path d="M20 3.6v5h-5"/>
+          </svg>
+          رز را دوباره شکوفا کن
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="fade-item" style="--fd:.95s">
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+      <path d="M12 3c.7 4.2 2.3 5.8 6.5 6.5-4.2.7-5.8 2.3-6.5 6.5-.7-4.2-2.3-5.8-6.5-6.5C9.7 8.8 11.3 7.2 12 3Z"/>
+    </svg>
+    با همه‌ی مهر، برای فاطمه رشدی · ۱۱ اکتبر، روز جهانی دختر
+  </footer>
+</main>
+
+<script>
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+let uid=0;
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- ابزار ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
+function shade(hex,f){const n=parseInt(hex.slice(1),16);
+  const r=Math.min(255,Math.round(((n>>16)&255)*f)),g=Math.min(255,Math.round(((n>>8)&255)*f)),b=Math.min(255,Math.round((n&255)*f));
+  return`rgb(${r},${g},${b})`}
+function addStop(g,off,color,op=1){const s=document.createElementNS(NS,'stop');
+  s.setAttribute('offset',off);s.setAttribute('stop-color',color);if(op<1)s.setAttribute('stop-opacity',op);g.appendChild(s)}
+function smoothClosed(pts){
+  const n=pts.length,f=v=>(+v).toFixed(2);
+  let d=`M ${f(pts[0][0])} ${f(pts[0][1])}`;
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    d+=` C ${f(p1[0]+(p2[0]-p0[0])/6)} ${f(p1[1]+(p2[1]-p0[1])/6)}, ${f(p2[0]-(p3[0]-p1[0])/6)} ${f(p2[1]-(p3[1]-p1[1])/6)}, ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d+' Z';
+}
+
+/* ---------- پالت‌ها ---------- */
+const PAL_RED={edges:['#ff8f9d','#f97f8f','#ffa3ad'],mids:['#d92c48','#c92340','#e03a52'],
+  bases:['#7c0d1f','#6d0a1a','#8a1126'],core:['#66091a','#460710'],crest:'#5a0714',line:'rgba(78,5,16,.55)'};
+const PAL_PINK={edges:['#ffd6e2','#fccadb','#ffcbd9'],mids:['#ee8cab','#e97fa3','#f392b0'],
+  bases:['#c05680','#b14a72','#c96087'],core:['#a04066','#7c2c4c'],crest:'#8d3153',line:'rgba(140,45,80,.4)'};
+const AUTUMN=[['#e6b54b','#c8862b'],['#dd9437','#b25a1f'],['#cd6a2c','#8f3c1d'],
+  ['#e0bd4e','#b8872a'],['#d8a13c','#a05528'],['#b5a83e','#7d8a33']];
+
+/* ---------- شکل گلبرگ ---------- */
+function petalD(len,wid,rnd,flare){
+  const J=a=>a*(1+(rnd()*2-1)*0.05), F=x=>x*flare, f=v=>(+v).toFixed(2);
+  const pts=[
+    [0,0],
+    [F(-J(wid*.30)),-len*.14],[F(-J(wid*.50)),-len*.45],[F(-J(wid*.45)),-len*.72],
+    [F(-J(wid*.25)),-len*.88],[F(-J(wid*.10)),-len],
+    [F(J(wid*.10)),-len*.90],[F(J(wid*.26)),-len*.985],[F(J(wid*.42)),-len*.865],
+    [F(J(wid*.50)),-len*.60],[F(J(wid*.35)),-len*.28],[F(J(wid*.16)),-len*.09]
+  ];
+  return smoothClosed(pts);
+}
+function crestD(len,wid,rnd){
+  const a=wid*(.10+rnd()*.05),b=wid*(.08+rnd()*.05),f=v=>(+v).toFixed(1);
+  return`M ${f(-a*.35)} ${f(-len*.06)} C ${f(a)} ${f(-len*.34)}, ${f(a*.85)} ${f(-len*.62)}, 0 ${f(-len*.9)}
+         C ${f(-b*.85)} ${f(-len*.62)}, ${f(-b)} ${f(-len*.34)}, ${f(-a*.35)} ${f(-len*.06)} Z`;
+}
+function veinD(len,wid,rnd,side){
+  const f=v=>(+v).toFixed(1), x2=side*wid*(.16+rnd()*.08);
+  return`M ${f(side*wid*.03)} ${f(-len*.12)} C ${f(side*wid*.09)} ${f(-len*.42)}, ${f(x2)} ${f(-len*.6)}, ${f(x2*.72)} ${f(-len*.85)}`;
+}
+
+/* ---------- ساخت رز ---------- */
+function makeRose({palette,seed=1,interactive=false}){
+  const rnd=mulberry32(seed);
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','-8 -8 256 256');
+  svg.classList.add('rose');
+  const defs=document.createElementNS(NS,'defs');svg.appendChild(defs);
+  const id='r'+(++uid);
+  const LAYERS=[
+    {n:7, r:14,len:40,w:32,flare:.94, dark:.62,base:1120,step:52},
+    {n:9, r:30,len:56,w:42,flare:1.00,dark:.80,base:620, step:46},
+    {n:12,r:47,len:70,w:54,flare:1.07,dark:.96,base:60,  step:34}
+  ];
+  LAYERS.forEach((L,li)=>{
+    for(let v=0;v<2;v++){
+      const g=document.createElementNS(NS,'linearGradient');
+      g.setAttribute('id',`${id}-p${li}${v}`);
+      g.setAttribute('x1','0');g.setAttribute('y1','1');g.setAttribute('x2','0');g.setAttribute('y2','0');
+      addStop(g,'0%',  shade(palette.bases[v%palette.bases.length],L.dark));
+      addStop(g,'52%', shade(palette.mids[v%palette.mids.length], L.dark));
+      addStop(g,'100%',shade(palette.edges[v%palette.edges.length],L.dark));
+      defs.appendChild(g);
+    }
+    const c=document.createElementNS(NS,'linearGradient');
+    c.setAttribute('id',`${id}-c${li}`);
+    c.setAttribute('x1','0');c.setAttribute('y1','1');c.setAttribute('x2','0');c.setAttribute('y2','0');
+    addStop(c,'0%',palette.crest,0);addStop(c,'46%',palette.crest,.3);addStop(c,'88%',palette.crest,.04);
+    defs.appendChild(c);
+  });
+  const cg=document.createElementNS(NS,'radialGradient');cg.setAttribute('id',`${id}-core`);
+  addStop(cg,'0%',palette.core[1]);addStop(cg,'70%',palette.core[0]);addStop(cg,'100%',shade(palette.core[0],.7));
+  defs.appendChild(cg);
+
+  const layerEls={};
+  [2,1,0].forEach(li=>{
+    const L=LAYERS[li];
+    const g=document.createElementNS(NS,'g');g.setAttribute('class','layer l'+li);
+    svg.appendChild(g);layerEls[li]=g;
+    const off=rnd()*360, order=[];
+    for(let i=0;i<L.n;i++)order.push({i,ang:off+i*360/L.n+(rnd()-.5)*26})
